@@ -6,7 +6,8 @@ public class SimpleFunction {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public static String concat(String str1, String str2) {
+	public static String concat(String str1, String str2) throws Exception{
+		if(str1 == null || str2 == null) throw new Exception("Parameter is null.");
 		return str1 + str2;
 	}
 	
