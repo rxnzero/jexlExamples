@@ -30,6 +30,16 @@ public class JexlFunctionTest {
 	    System.out.println(String.format("%s = %s", exp,result) );
 	}
 	
+	private void testJexlScript() {
+		String exp = "user =^ 'dhl'";
+		JexlEngine engine = new JexlBuilder().cache(100).create();
+		JexlContext jc = new MapContext();
+		jc.set("user", "dhlee");
+		JexlScript expr = engine.createScript(exp);
+	    Object result = expr.execute(jc);
+	    System.out.println(String.format("%s = %s", exp,result) );
+	}
+	
 	private void testSimpleConcat(boolean withCache, String word1, String word2) {
 		String exp = "word1 + ' ' + word2";
 		JexlEngine engine = null;
@@ -91,15 +101,19 @@ public class JexlFunctionTest {
 	}
 	
 	private void testSimpleNamespaceFunction(String s1, String s2) {
-		String exp = "uf:concat(message.group.field1, message.group.field2)";
+		String exp = "concat(message.group.field1, message.group.field2)";
 		
 		System.out.println("\n>> testSimpleNamespaceFunction exp : " + exp);
 		
 		// pre-defined functions
 		Map<String, Object> funcs = new HashMap<String, Object>();
-        funcs.put("uf", new SimpleFunction());
         
-        // 
+		// Top level function (null namespace function)
+		funcs.put(null, new SimpleFunction());
+		
+		// use function name -> uf:concat(...)
+//		funcs.put("uf", new SimpleFunction());
+		
 		JexlEngine engine = new JexlBuilder().silent(false).strict(true).safe(false).cache(10000).namespaces(funcs).create();
 		
 		JexlContext jc = new MapContext();
@@ -149,15 +163,15 @@ public class JexlFunctionTest {
 	
 	public static void main(String[] args) {
 		JexlFunctionTest example = new JexlFunctionTest();
-//		example.testSimpleMath(10);
-//		example.testSimpleNamespaceFunction("add1", "more2");
-//		example.testSimpleUserFunction("add1", "more2");
+ //		example.testSimpleMath(10);
+//		example.testJexlScript();
+		example.testSimpleNamespaceFunction("add1", "more2");
+		example.testSimpleUserFunction("add1", "more2");
 		
-//		word1 + ' ' + word2 = Hello999999 JXEL999999 594ms
-//		word1 + ' ' + word2 = Hello999999 JXEL999999 13845ms
-		example.testSimpleConcat(true, "Hello", "JEXL");
-		example.testSimpleConcat(false, "Hello", "JEXL");
-		
+//		word1 + ' ' + word2 = Hello999999 JEXL999999 594ms
+//		word1 + ' ' + word2 = Hello999999 JEXL999999 13845ms
+//		example.testSimpleConcat(true, "Hello", "JEXL");
+//		example.testSimpleConcat(false, "Hello", "JEXL");
 	}
 
 }
