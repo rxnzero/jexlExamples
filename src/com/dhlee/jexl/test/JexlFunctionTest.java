@@ -17,7 +17,7 @@ import org.apache.commons.jexl3.MapContext;
 public class JexlFunctionTest {
 
 	public JexlFunctionTest() {
-		// TODO Auto-generated constructor stub
+
 	}
 	
 	private void testSimpleMath(int x) {
@@ -28,6 +28,30 @@ public class JexlFunctionTest {
 		JexlExpression e = engine.createExpression(exp);
 	    Object result = e.evaluate(jc);
 	    System.out.println(String.format("%s = %s", exp,result) );
+	}
+	
+	private void testSimpleConcat(boolean withCache, String word1, String word2) {
+		String exp = "word1 + ' ' + word2";
+		JexlEngine engine = null;
+		if(withCache) {
+			engine = new JexlBuilder().cache(100).create();
+		}
+		else {
+			engine = new JexlBuilder().create();
+		}
+		
+		Object result = null;
+		long t = System.currentTimeMillis();
+		for(int i=0; i< 1000000; i++) {
+			JexlContext jc = new MapContext();
+			jc.set("word1", word1+i);
+			jc.set("word2", word2+i);
+			JexlExpression e = engine.createExpression(exp);
+		    result = e.evaluate(jc);
+		}
+		System.out.println(String.format("%s = %s", exp,result) +  " " + (System.currentTimeMillis() - t) + "ms");
+		
+//	    System.out.println(String.format("%s = %s", exp,result) );
 	}
 	
 	Map<String, Object> collectVars(JexlScript script, JexlContext context) {
@@ -71,11 +95,12 @@ public class JexlFunctionTest {
 		
 		System.out.println("\n>> testSimpleNamespaceFunction exp : " + exp);
 		
+		// pre-defined functions
 		Map<String, Object> funcs = new HashMap<String, Object>();
         funcs.put("uf", new SimpleFunction());
         
-        // new JexlBuilder().silent(false).strict(true).safe(false).cache(100).namespaces(funcs).create();
-		JexlEngine engine = new JexlBuilder().namespaces(funcs).create();
+        // 
+		JexlEngine engine = new JexlBuilder().silent(false).strict(true).safe(false).cache(10000).namespaces(funcs).create();
 		
 		JexlContext jc = new MapContext();
 		
@@ -100,7 +125,7 @@ public class JexlFunctionTest {
 		
 		Map<String, Object> funcs = new HashMap<String, Object>();
         
-		JexlEngine engine = new JexlBuilder().silent(false).strict(true).safe(false).cache(100).namespaces(funcs).create();
+		JexlEngine engine = new JexlBuilder().silent(false).strict(true).safe(false).cache(10000).namespaces(funcs).create();
 		
 		JexlContext jc = new MapContext();
 		
@@ -124,9 +149,15 @@ public class JexlFunctionTest {
 	
 	public static void main(String[] args) {
 		JexlFunctionTest example = new JexlFunctionTest();
-		example.testSimpleMath(10);
-		example.testSimpleNamespaceFunction("add1", "more2");
-		example.testSimpleUserFunction("add1", "more2");
+//		example.testSimpleMath(10);
+//		example.testSimpleNamespaceFunction("add1", "more2");
+//		example.testSimpleUserFunction("add1", "more2");
+		
+//		word1 + ' ' + word2 = Hello999999 JXEL999999 594ms
+//		word1 + ' ' + word2 = Hello999999 JXEL999999 13845ms
+		example.testSimpleConcat(true, "Hello", "JXEL");
+		example.testSimpleConcat(false, "Hello", "JXEL");
+		
 	}
 
 }
