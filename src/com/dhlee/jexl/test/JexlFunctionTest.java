@@ -155,8 +155,8 @@ public class JexlFunctionTest {
 		
 //		word1 + ' ' + word2 = Hello999999 JXEL999999 594ms
 //		word1 + ' ' + word2 = Hello999999 JXEL999999 13845ms
-		example.testSimpleConcat(true, "Hello", "JXEL");
-		example.testSimpleConcat(false, "Hello", "JXEL");
+		example.testSimpleConcat(true, "Hello", "JEXL");
+		example.testSimpleConcat(false, "Hello", "JEXL");
 		
 	}
 
