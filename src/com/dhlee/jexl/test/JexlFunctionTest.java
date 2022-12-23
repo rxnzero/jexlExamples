@@ -40,11 +40,12 @@ public class JexlFunctionTest {
 	    System.out.println(String.format("%s = %s", exp,result) );
 	}
 	
-	private void testSimpleConcat(boolean withCache, String word1, String word2) {
+	private void testSimpleConcat(boolean withCache, int cacheExpMaxLength, String word1, String word2) {
 		String exp = "word1 + ' ' + word2";
 		JexlEngine engine = null;
 		if(withCache) {
-			engine = new JexlBuilder().cache(100).create();
+			// important : cacheThreshold 보다 길이가 작을 경우에만 cache됨.
+			engine = new JexlBuilder().cache(100).cacheThreshold(cacheExpMaxLength).create();			
 		}
 		else {
 			engine = new JexlBuilder().create();
@@ -56,8 +57,12 @@ public class JexlFunctionTest {
 			JexlContext jc = new MapContext();
 			jc.set("word1", word1+i);
 			jc.set("word2", word2+i);
-			JexlExpression e = engine.createExpression(exp);
-		    result = e.evaluate(jc);
+//			JexlExpression e = engine.createExpression(exp);
+//			result = e.evaluate(jc);
+			
+			JexlScript script = engine.createScript(exp);
+			result = script.execute(jc);
+			
 		}
 		System.out.println(String.format("%s = %s", exp,result) +  " " + (System.currentTimeMillis() - t) + "ms");
 		
@@ -165,13 +170,19 @@ public class JexlFunctionTest {
 		JexlFunctionTest example = new JexlFunctionTest();
  //		example.testSimpleMath(10);
 //		example.testJexlScript();
-		example.testSimpleNamespaceFunction("add1", "more2");
-		example.testSimpleUserFunction("add1", "more2");
-		
+//		example.testSimpleNamespaceFunction("add1", "more2");
+//		example.testSimpleUserFunction("add1", "more2");
+
+		// expression
 //		word1 + ' ' + word2 = Hello999999 JEXL999999 594ms
 //		word1 + ' ' + word2 = Hello999999 JEXL999999 13845ms
-//		example.testSimpleConcat(true, "Hello", "JEXL");
-//		example.testSimpleConcat(false, "Hello", "JEXL");
+		// script
+//		word1 + ' ' + word2 = Hello999999 JEXL999999 644ms
+//		word1 + ' ' + word2 = Hello999999 JEXL999999 14354ms
+		example.testSimpleConcat(true, 1024, "Hello", "JEXL");
+		example.testSimpleConcat(false, 1024, "Hello", "JEXL");
+		
+		
 	}
 
 }
