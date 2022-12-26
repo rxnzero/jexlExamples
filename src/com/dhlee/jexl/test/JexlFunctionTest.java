@@ -118,12 +118,13 @@ public class JexlFunctionTest {
 		// use function name -> uf:concat(...)
 		funcs.put("uf", new SimpleFunction());
 		
-		Charset expCharset = Charset.forName("utf-8");
+		JexlBuilder builder = new JexlBuilder();		
+//		Charset expCharset = Charset.forName("utf-8");
+//		System.out.println("Charset = " + expCharset);
+//		builder.charset(expCharset);		
+		builder.silent(false).strict(true).safe(false).cache(10000).namespaces(funcs);
 		
-		System.out.println("Charset = " + expCharset);
-		
-		JexlEngine engine = new JexlBuilder()
-				.charset(expCharset).silent(false).strict(true).safe(false).cache(10000).namespaces(funcs).create();
+		JexlEngine engine = builder.create();
 		
 		JexlContext jc = new MapContext();
 		
