@@ -123,6 +123,7 @@ public class JavaScriptExample {
 		}
 	}
 	
+	// deprecated in JDK 11 as part of JEP 335 and has been removed from JDK15 as part of JEP 372.
 	private static void testNashorn() throws Exception {
 		ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 		engine.eval(new FileReader("./js/example.js"));

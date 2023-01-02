@@ -1,5 +1,6 @@
 package com.dhlee.jexl.test;
 
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,6 +51,43 @@ public class JexlFunctionTest {
 		}
 		else {
 			engine = new JexlBuilder().create();
+		}
+		
+		Object result = null;
+		long t = System.currentTimeMillis();
+		for(int i=0; i< 1000000; i++) {
+			JexlContext jc = new MapContext();
+			jc.set("word1", word1+i);
+			jc.set("word2", word2+i);
+//			JexlExpression e = engine.createExpression(exp);
+//			result = e.evaluate(jc);
+			
+			JexlScript script = engine.createScript(exp);
+			result = script.execute(jc);
+			
+		}
+		System.out.println(String.format("%s = %s", exp,result) +  " " + (System.currentTimeMillis() - t) + "ms");
+		
+//	    System.out.println(String.format("%s = %s", exp,result) );
+	}
+	
+	private void testFunctionConcat(boolean withCache, int cacheExpMaxLength, String word1, String word2) {
+		String exp = "concat(word1, word2)";
+		JexlEngine engine = null;
+
+		
+		// pre-defined functions
+		Map<String, Object> funcs = new HashMap<String, Object>();
+        
+		// Top level function (null namespace function)
+		funcs.put(null, new SimpleFunction());
+
+		if(withCache) {
+			// important : cacheThreshold 보다 길이가 작을 경우에만 cache됨.
+			engine = new JexlBuilder().cache(100).cacheThreshold(cacheExpMaxLength).namespaces(funcs).create();			
+		}
+		else {
+			engine = new JexlBuilder().namespaces(funcs).create();
 		}
 		
 		Object result = null;
@@ -231,55 +269,103 @@ public class JexlFunctionTest {
 		testSimpleConcat(false, 1024, "Hello", "JEXL");
 	}
 
+	private void testFunctionCache() {
+		// expression
+//		word1 + ' ' + word2 = Hello999999 JEXL999999 594ms
+//		word1 + ' ' + word2 = Hello999999 JEXL999999 13845ms
+		// script
+//		word1 + ' ' + word2 = Hello999999 JEXL999999 644ms
+//		word1 + ' ' + word2 = Hello999999 JEXL999999 14354ms
+		testFunctionConcat(true, 1024, "Hello", "JEXL");
+//		testFunctionConcat(false, 1024, "Hello", "JEXL");
+	}
+
+	
+	private static String toTypeValue(int dataType, String svalue) {
+		if(svalue == null) return svalue;
+		
+		if(dataType == 1) {
+			return svalue;
+		}
+		else {
+			char[] charValues = svalue.trim().toCharArray();
+			int i = 0;
+			for(; i< charValues.length; i++) {
+				if(charValues[i] == '0' || charValues[i] == ' ') {
+					continue;
+				}
+				break;
+			}
+			return new String(charValues, i, (charValues.length - i));
+		}
+	}
+	
 	public static void main(String[] args) {
 		JexlFunctionTest example = new JexlFunctionTest();
- 		example.testSimpleMath(10);
-		example.testJexlScript();
 		
-		Map<String, Object> varMap = new HashMap<String, Object>();
+		System.out.println(toTypeValue(2, null));
 		
-		varMap.put("message.group.field1", "add1");
-		varMap.put("message.group.field2", "more2");
-		example.testSimpleNamespaceFunction(varMap);
-		example.testSimpleUserFunction(varMap);
+		System.out.println(toTypeValue(1, "12345"));
+		System.out.println(toTypeValue(1, "00012345"));
+		System.out.println(toTypeValue(1, "12345000"));
+		System.out.println(toTypeValue(1, "00012345000"));
 		
-		String exp = null;
+		System.out.println("\n");
 		
-		exp = "concat(group.param1, group.param2)";
-		varMap.clear();
-		varMap.put("group.param1", "안녕");
-		varMap.put("group.param2", "jexl");
+		System.out.println(toTypeValue(2, "12345"));
+		System.out.println(toTypeValue(2, "00012345"));
+		System.out.println(toTypeValue(2, "12345000"));
+		System.out.println(toTypeValue(2, "00012345000"));
 		
-		try {
-			example.testSimpleFunction(exp, varMap);
-		}
-		catch(Exception ex) {
-			ex.printStackTrace();
-		}
-		
-		exp = "concat(인자1, 인자2)";
-		
-		varMap.clear();
-		varMap.put("인자1", "안녕");
-		varMap.put("인자2", "jexl");
-		try {
-			example.testSimpleFunction(exp, varMap);
-		}
-		catch(Exception ex) {
-			ex.printStackTrace();
-		}
-		
-		exp = "concat(그룹.인자1, 그룹.인자2)";
-		
-		varMap.clear();
-		varMap.put("그룹.인자1", "안녕");
-		varMap.put("그룹.인자2", "jexl");
-		try {
-			example.testSimpleFunction(exp, varMap);
-		}
-		catch(Exception ex) {
-			ex.printStackTrace();
-		}
+//		example.testFunctionCache();
+//		
+// 		example.testSimpleMath(10);
+//		example.testJexlScript();
+//		
+//		Map<String, Object> varMap = new HashMap<String, Object>();
+//		
+//		varMap.put("message.group.field1", "add1");
+//		varMap.put("message.group.field2", "more2");
+//		example.testSimpleNamespaceFunction(varMap);
+//		example.testSimpleUserFunction(varMap);
+//		
+//		String exp = null;
+//		
+//		exp = "concat(group.param1, group.param2)";
+//		varMap.clear();
+//		varMap.put("group.param1", "안녕");
+//		varMap.put("group.param2", "jexl");
+//		
+//		try {
+//			example.testSimpleFunction(exp, varMap);
+//		}
+//		catch(Exception ex) {
+//			ex.printStackTrace();
+//		}
+//		
+//		exp = "concat(인자1, 인자2)";
+//		
+//		varMap.clear();
+//		varMap.put("인자1", "안녕");
+//		varMap.put("인자2", "jexl");
+//		try {
+//			example.testSimpleFunction(exp, varMap);
+//		}
+//		catch(Exception ex) {
+//			ex.printStackTrace();
+//		}
+//		
+//		exp = "concat(그룹.인자1, 그룹.인자2)";
+//		
+//		varMap.clear();
+//		varMap.put("그룹.인자1", "안녕");
+//		varMap.put("그룹.인자2", "jexl");
+//		try {
+//			example.testSimpleFunction(exp, varMap);
+//		}
+//		catch(Exception ex) {
+//			ex.printStackTrace();
+//		}
 		
 		
 	}
