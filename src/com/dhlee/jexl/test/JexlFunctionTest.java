@@ -300,11 +300,8 @@ public class JexlFunctionTest {
 		}
 	}
 	
-	public static void main(String[] args) {
-		JexlFunctionTest example = new JexlFunctionTest();
-		
+	public static void testToTypeValue() {
 		System.out.println(toTypeValue(2, null));
-		
 		System.out.println(toTypeValue(1, "12345"));
 		System.out.println(toTypeValue(1, "00012345"));
 		System.out.println(toTypeValue(1, "12345000"));
@@ -316,56 +313,59 @@ public class JexlFunctionTest {
 		System.out.println(toTypeValue(2, "00012345"));
 		System.out.println(toTypeValue(2, "12345000"));
 		System.out.println(toTypeValue(2, "00012345000"));
+	}
+	
+	public static void main(String[] args) {
+		JexlFunctionTest example = new JexlFunctionTest();
+		example.testFunctionCache();
 		
-//		example.testFunctionCache();
-//		
-// 		example.testSimpleMath(10);
-//		example.testJexlScript();
-//		
-//		Map<String, Object> varMap = new HashMap<String, Object>();
-//		
-//		varMap.put("message.group.field1", "add1");
-//		varMap.put("message.group.field2", "more2");
-//		example.testSimpleNamespaceFunction(varMap);
-//		example.testSimpleUserFunction(varMap);
-//		
-//		String exp = null;
-//		
-//		exp = "concat(group.param1, group.param2)";
-//		varMap.clear();
-//		varMap.put("group.param1", "안녕");
-//		varMap.put("group.param2", "jexl");
-//		
-//		try {
-//			example.testSimpleFunction(exp, varMap);
-//		}
-//		catch(Exception ex) {
-//			ex.printStackTrace();
-//		}
-//		
-//		exp = "concat(인자1, 인자2)";
-//		
-//		varMap.clear();
-//		varMap.put("인자1", "안녕");
-//		varMap.put("인자2", "jexl");
-//		try {
-//			example.testSimpleFunction(exp, varMap);
-//		}
-//		catch(Exception ex) {
-//			ex.printStackTrace();
-//		}
-//		
-//		exp = "concat(그룹.인자1, 그룹.인자2)";
-//		
-//		varMap.clear();
-//		varMap.put("그룹.인자1", "안녕");
-//		varMap.put("그룹.인자2", "jexl");
-//		try {
-//			example.testSimpleFunction(exp, varMap);
-//		}
-//		catch(Exception ex) {
-//			ex.printStackTrace();
-//		}
+ 		example.testSimpleMath(10);
+		example.testJexlScript();
+		
+		Map<String, Object> varMap = new HashMap<String, Object>();
+		
+		varMap.put("message.group.field1", "add1");
+		varMap.put("message.group.field2", "more2");
+		example.testSimpleNamespaceFunction(varMap);
+		example.testSimpleUserFunction(varMap);
+		
+		String exp = null;
+		
+		exp = "concat(group.param1, group.param2)";
+		varMap.clear();
+		varMap.put("group.param1", "안녕");
+		varMap.put("group.param2", "jexl");
+		
+		try {
+			example.testSimpleFunction(exp, varMap);
+		}
+		catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		exp = "concat(인자1, 인자2)";
+		
+		varMap.clear();
+		varMap.put("인자1", "안녕");
+		varMap.put("인자2", "jexl");
+		try {
+			example.testSimpleFunction(exp, varMap);
+		}
+		catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		exp = "concat(그룹.인자1, 그룹.인자2)";
+		
+		varMap.clear();
+		varMap.put("그룹.인자1", "안녕");
+		varMap.put("그룹.인자2", "jexl");
+		try {
+			example.testSimpleFunction(exp, varMap);
+		}
+		catch(Exception ex) {
+			ex.printStackTrace();
+		}
 		
 		
 	}
